@@ -1,0 +1,188 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/templates/Layout.xhtml">
+
+	<ui:define name="content"> 
+	
+		<h1 class="aw-page-title">Cadastro de Plano de Voo</h1>
+
+		<h:form id="form">
+			<p:messages autoUpdate="true" showDetail="true" />
+			
+			<p:fieldset legend="Filtro" toggleable="true" toggleSpeed="500">
+					<h:panelGrid columns="6" style="margin-bottom:10px" cellpadding="5">
+					 	<p:outputLabel for="planeta" value="Paneta:" />
+						<p:selectOneMenu id="planeta" style="width:150px"
+										 value="#{planoVooController.planoVooFilter.planetaDestino.url}" filter="true" filterMatchMode="startsWith">
+							<f:selectItem itemLabel="----- Selecione -----" itemValue="" ></f:selectItem>
+							<f:selectItems value="#{planoVooController.listaPlaneta}"
+								var="planeta" itemLabel="#{planeta.name}"
+								itemValue="#{planeta.url}" />	
+						</p:selectOneMenu>
+		
+						<p:outputLabel for="nave" value="Nave:" />
+						<p:selectOneMenu style="width:200px" id="nave"
+										 value="#{planoVooController.planoVooFilter.naveEspacial.url}" filter="true" filterMatchMode="startsWith">
+							<f:selectItem itemLabel="----- Selecione -----" itemValue="" ></f:selectItem>
+							<f:selectItems value="#{planoVooController.listaNave}" var="nave"
+										   itemLabel="#{nave.name}" itemValue="#{nave.url}" />
+						</p:selectOneMenu>
+						
+						<p:commandButton value="Pesquisar"  update="singleDT"
+										 action="#{planoVooController.pesquisar}"/>
+					</h:panelGrid>
+			</p:fieldset>
+
+			<h:panelGrid columns="6" style="margin-bottom:10px" cellpadding="5">
+					<p:dataTable var="plano" id="singleDT" value="#{planoVooController.listaPlanoVoo}"  emptyMessage="Nenhum Registro Encontrado" 
+						 selection="#{planoVooController.listaPlanoSelected}" rowKey="#{plano.codigo}" 
+						 paginator="true" rows="10">
+						 
+						<f:facet name="header">Plano de Voo</f:facet>
+						
+	       				<p:column selectionMode="multiple" style="width:16px;text-align:center"/>
+					    <p:column headerText="Código" style="width:70px">
+					        <h:outputText value="#{plano.codigo}" />
+					    </p:column>
+					    
+					    <p:column headerText="Planeta" style="width:200px">
+					        <h:outputText value="#{plano.planetaDestino.name}" />
+					    </p:column>
+					 
+					    <p:column headerText="Nave Espacial" style="width:300px">
+					        <h:outputText value="#{plano.naveEspacial.name}" />
+					    </p:column>	
+					    
+					    <p:column headerText="Data" style="width:300px">
+					        <h:outputText value="#{plano.dataVoo}">
+					        	<f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+		                    </h:outputText>
+					    </p:column>		
+					    
+					    <p:column style="width:32px;text-align: center">
+				             <p:commandButton update="form:idcarDialog"  process="singleDT"
+				              				oncomplete="PF('carDialog').show()" icon="ui-icon-search" title="detalhar">
+				                <f:setPropertyActionListener value="#{plano}" target="#{planoVooController.planoVooDetalhe}" />
+				             </p:commandButton>
+				        </p:column>
+				        
+				        <p:column style="width:32px;text-align: center">
+				             <p:commandButton update="form:idcarDialog"  process="singleDT" 
+				             				  action="#{planoVooController.editar(plano.codigo)}"  icon="ui-icon-pencil" title="Editar"/>
+				        </p:column>				         
+					</p:dataTable>
+			</h:panelGrid>
+			
+			<h:panelGrid columns="3" style="margin-bottom:10px" cellpadding="5">
+						<p:commandButton value="Excluir" 
+							onclick="PF('excluirManualDialog').show() " icon="ui-icon-trash" />
+						<p:commandButton value="Novo" action="cadastroPlanoVoo"
+							icon="ui-icon-check" />
+			</h:panelGrid>
+
+			<p:confirmDialog id="excluirMensagemModal" width="500"
+							header="Confirmação de exclusão" severity="alert"
+							widgetVar="excluirManualDialog" closable="false" appendToBody="true">
+				<f:facet name="message">
+					<h:outputFormat value="Confirmar Exclusão?" />
+				</f:facet>
+
+				<p:commandButton value="Sim"  update="@form" oncomplete="PF('excluirManualDialog').hide()"
+					action="#{planoVooController.excluir}"/>
+				<p:commandButton value="Não" onclick="excluirManualDialog.hide()" />
+			</p:confirmDialog>
+
+			<p:dialog header="Plano de Voo" widgetVar="carDialog" 
+					  id="idcarDialog" modal="true"  resizable="false">
+		        <p:outputPanel id="carDetail">
+		            <p:panelGrid  columns="1"  >
+		               <p:panelGrid >
+		               		<p:row style="font-weight:bold">
+					      	 	<p:column colspan="2"  ><h:outputText value="Informações Gerais" /></p:column>
+					      	 </p:row>
+		               		<p:row>					      	 
+						      	<p:column><h:outputText value="Código:" style="font-weight:bold" /></p:column>
+				               <p:column> <h:outputText value="#{planoVooController.planoVooDetalhe.codigo}" /></p:column>
+			                </p:row>
+			                <p:row>					      	 
+			                	<p:column><h:outputText value="Data/Hora" style="font-weight:bold"  /></p:column>
+						      	<p:column>
+						      		<h:outputText value="#{planoVooController.planoVooDetalhe.dataVoo}">
+					        			<f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+		                    		</h:outputText>
+		                    	</p:column>		                    	
+			                </p:row>
+					    </p:panelGrid>			            
+					    
+					    <p:panelGrid >
+					      	 <p:row style="font-weight:bold">
+					      	 	<p:column colspan="4" ><h:outputText value="Planeta" /></p:column>
+					      	 </p:row>
+					      	
+							 <p:row>
+					      	 	<p:column><h:outputText value="Nome:" style="font-weight:bold" /> </p:column>
+					      	 	<p:column><h:outputText value="#{planoVooController.planoVooDetalhe.planetaDestino.name}" /> </p:column>					      	 	
+					      	    <p:column> <h:outputText value="Diâmetro:" style="font-weight:bold" /></p:column>
+					      	 	<p:column> <h:outputText value="#{planoVooController.planoVooDetalhe.planetaDestino.diameter}" /></p:column>
+					      	 </p:row>
+					      	 					      	 
+					      	  <p:row>
+					      	 	<p:column><h:outputText value="Clima:" style="font-weight:bold" /> </p:column>
+					      	 	<p:column> <h:outputText value="#{planoVooController.planoVooDetalhe.planetaDestino.climate}" /></p:column>
+					      	    <p:column> <h:outputText value="Terreno:" style="font-weight:bold"  /></p:column>
+					      	 	<p:column><h:outputText value="#{planoVooController.planoVooDetalhe.planetaDestino.terrain}" /> </p:column>
+					      	 </p:row>
+					      	 
+					      	  <p:row>
+					      	 	<p:column> <h:outputText value="População:" style="font-weight:bold" /></p:column>
+					      	 	<p:column><h:outputText value="#{planoVooController.planoVooDetalhe.planetaDestino.population}" /> </p:column>
+					      	 </p:row>
+			                
+			            </p:panelGrid>
+			                 
+		                <p:panelGrid >
+					      	 <p:row style="font-weight:bold">
+					      	 	<p:column colspan="2" ><h:outputText value="Nave Espacial" /></p:column>
+					      	 </p:row>
+					      	
+							 <p:row>
+					      	 	<p:column><h:outputText value="Nome:" style="font-weight:bold" /></p:column>
+					      	 	<p:column><h:outputText value="#{planoVooController.planoVooDetalhe.naveEspacial.name}" /> </p:column>					      	 	
+					      	 </p:row>
+					      	 
+					      	 <p:row>
+					      	 	<p:column><h:outputText value="Modelo:" style="font-weight:bold" /></p:column>
+					      	 	<p:column><h:outputText value="#{planoVooController.planoVooDetalhe.naveEspacial.model}" /> </p:column>					      	 	
+					      	 </p:row>
+					      	 
+					      	 <p:row>
+					      	 	<p:column><h:outputText value="Passageiros:" style="font-weight:bold" /></p:column>
+					      	 	<p:column><h:outputText value="#{planoVooController.planoVooDetalhe.naveEspacial.passengers}" /> </p:column>					      	 	
+					      	 </p:row>
+				      	</p:panelGrid>						
+			             
+		               <p:dataTable var="tripulante" id="singleDetalhe"  style="max-width: 500px; min-width: 500px" 
+		               				paginator="true" rows="3"
+		                			value="#{planoVooController.planoVooDetalhe.listaTripulante}" >	
+		                				
+		        			<f:facet name="header">Tripulantes</f:facet>
+		        			
+						    <p:column headerText="Nome">
+						        <h:outputText value="#{tripulante.name}" />
+						    </p:column>
+						 
+						    <p:column headerText="Sexo">
+						        <h:outputText value="#{tripulante.gender}" />
+						    </p:column>		
+						</p:dataTable>
+			              
+		            </p:panelGrid>
+		        </p:outputPanel>
+	    </p:dialog>
+	</h:form>
+</ui:define>
+
+</ui:composition>

@@ -1,0 +1,67 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/templates/Layout.xhtml">
+
+	<ui:define name="content">
+		 <f:metadata>
+			<f:event type="preRenderView" 	listener="#{planoVooController.initCadastroPlanoVoo(param['codigo'])}"  />
+		</f:metadata>
+	
+		<h1 class="aw-page-title">Cadastro de Plano de Voo</h1>
+
+		<h:form id="form">
+  			<p:growl id="growl" showDetail="true" sticky="true" />  
+			<p:messages autoUpdate="true" />
+
+			<h:panelGrid columns="8" style="margin-bottom:10px" cellpadding="5">
+
+				<p:outputLabel for="planeta" value="Paneta:" />
+				<p:selectOneMenu id="planeta" style="width:150px"
+					value="#{planoVooController.planeta.url}" filter="true" filterMatchMode="startsWith">
+					<f:selectItems value="#{planoVooController.listaPlaneta}"
+						var="planeta" itemLabel="#{planeta.name}"
+						itemValue="#{planeta.url}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel for="nave" value="Nave:" />
+				<p:selectOneMenu style="width:200px" id="nave"
+					value="#{planoVooController.nave.url}" filter="true" filterMatchMode="startsWith">
+					<f:selectItems value="#{planoVooController.listaNave}" var="nave"
+						itemLabel="#{nave.name}" itemValue="#{nave.url}" />
+				</p:selectOneMenu>
+				
+				<p:outputLabel for="datetime" value="Data/Horário:" />
+        		<p:calendar id="datetime" value="#{planoVooController.dataVoo}" pattern="MM/dd/yyyy HH:mm" />
+			</h:panelGrid>
+			
+			<h:panelGrid columns="10" style="margin-bottom:10px" cellpadding="5">
+				<p:dataTable var="plano" id="singleDT" value="#{planoVooController.listaTripulante}"  paginator="true" rows="10"
+				             selection="#{planoVooController.listaTripulanteSelected}" rowKey="#{plano.url}" >
+				             
+						<f:facet name="header">Tripulantes</f:facet>
+						
+	        			<p:column selectionMode="multiple" style="width:16px;text-align:center"/>					    
+					 
+					    <p:column headerText="Nome">
+					        <h:outputText value="#{plano.name}" />
+					    </p:column>
+					 
+					    <p:column headerText="Sexo">
+					        <h:outputText value="#{plano.gender}" />
+					    </p:column>
+					</p:dataTable>
+			</h:panelGrid>
+			
+			<h:panelGrid columns="3" style="margin-bottom:10px" cellpadding="5">
+				<p:commandButton value="Salvar" process="@this,@form,form:planeta"
+								 action="#{planoVooController.salvar}" icon="ui-icon-check" />
+				
+				<p:commandButton value="Voltar" 
+								 action="manterPlanoVoo" icon="ui-icon-arrowrefresh-1-w" />
+			</h:panelGrid> 
+		</h:form>
+	</ui:define>
+</ui:composition>

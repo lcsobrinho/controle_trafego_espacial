@@ -150,7 +150,7 @@ public class PlanoVooDefaultBO implements PlanoVooBO{
 	@Override
 	public void excluir(List<PlanoVoo> listaPlanoSelected) throws Exception {
 		if(listaPlanoSelected == null || listaPlanoSelected.size() == 0){
-			throw new ApplicationException("Esclolha pelo menos um plano de Voo");
+			throw new ApplicationException("Esclolha pelo menos um Plano de Voo");
 		}
 		planoVooDAO.excluir(listaPlanoSelected);
 		

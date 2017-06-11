@@ -147,7 +147,7 @@ public class PlanoVooController implements Serializable {
 			}
 			
 			planoVooBO.salvar(planoVoo);
-			saveMessage("registro cadastrado com sucesso!");
+			saveMessage("Registro cadastrado com sucesso!");
 		}catch (Exception e) {
 			tratarExcessao(e);
 			return null;
